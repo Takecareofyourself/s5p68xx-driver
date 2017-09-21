@@ -46,25 +46,31 @@ long led_ioctl(struct *file,unsigned int cmd,unsigned long arg)
 		case 2:
 			if(cmd==CMD_LED_ON){
 				/*设置led2的管脚为0*/
+				gpio_set_value(PAD_GPIO_C+11,0);
 			}
 			else if(cmd==CMD_LED_OFF){
 				/*设置led2的管脚为1*/
+				gpio_set_value(PAD_GPIO_C+11,1);
 			}
 			break;
 		case 3:
 			if(cmd==CMD_LED_ON){
 				/*设置led3的管脚为0*/
+				gpio_set_value(PAD_GPIO_C+7,0);
 			}
 			else if(cmd==CMD_LED_OFF){
 				/*设置led3的管脚为1*/
+				gpio_set_value(PAD_GPIO_C+7,1);
 			}
 			break;
 		case 4:
 			if(cmd==CMD_LED_ON){
 				/*设置led4的管脚为0*/
+				gpio_set_value(PAD_GPIO_B+26,0);
 			}
 			else if(cmd==CMD_LED_OFF){
 				/*设置led4的管脚为1*/
+				gpio_set_value(PAD_GPIO_B+26,1);
 			}
 			break;
 		default:
@@ -96,7 +102,13 @@ int __init led_drv_init(void)
 	cdev_add(&led_cdev,led_dev,1);
 	/*申请GPIO管脚，并初始化GPIO管脚的模式*/
 	gpio_request(PAD_GPIO_C+12,"LED1");
-	gpio_direction_output(PAD_GPIO_C+1,1);
+	gpio_direction_output(PAD_GPIO_C+12,1);
+	gpio_request(PAD_GPIO_C+11,"LED1");
+	gpio_direction_output(PAD_GPIO_C+11,1);
+	gpio_request(PAD_GPIO_C+7,"LED1");
+	gpio_direction_output(PAD_GPIO_C+7,1);
+	gpio_request(PAD_GPIO_B+26,"LED1");
+	gpio_direction_output(PAD_GPIO_B+26,1);
 	/*注册class，注册device，实现设备的自动挂载*/
 	class_create(THIS_MODULE,"led_device");//创建设备文件夹
 	device_create(led_class,NULL,led_dev,"LED");//创建设备名字
@@ -110,6 +122,9 @@ void __exit led_drv_exit(void)
 	class_destroy(led_class);
 	/*注销管脚，释放资源*/
 	gpio_free(PAD_GPIO_C+12);
+	gpio_free(PAD_GPIO_C+11);
+	gpio_free(PAD_GPIO_C+7);
+	gpio_free(PAD_GPIO_B+26);
 	/*注销cdev*/
 	cdev_del(&led_cdev);
 	/*注销设备号，减少占用，节省资源*/
