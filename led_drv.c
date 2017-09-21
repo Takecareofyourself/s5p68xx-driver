@@ -36,9 +36,11 @@ long led_ioctl(struct *file,unsigned int cmd,unsigned long arg)
 		case 1:
 			if(cmd==CMD_LED_ON){
 				/*设置led1的管脚为0*/
+				gpio_set_value(PAD_GPIO_C+12,0);
 			}
 			else if(cmd==CMD_LED_OFF){
 				/*设置led1的管脚为1*/
+				gpio_set_value(PAD_GPIO_C+12,1);
 			}
 			break;
 		case 2:
@@ -93,7 +95,8 @@ int __init led_drv_init(void)
 	cdev_init(&led_cdev,&led_ops);
 	cdev_add(&led_cdev,led_dev,1);
 	/*申请GPIO管脚，并初始化GPIO管脚的模式*/
-
+	gpio_request(PAD_GPIO_C+12,"LED1");
+	gpio_direction_output(PAD_GPIO_C+1,1);
 	/*注册class，注册device，实现设备的自动挂载*/
 	class_create(THIS_MODULE,"led_device");//创建设备文件夹
 	device_create(led_class,NULL,led_dev,"LED");//创建设备名字
@@ -106,7 +109,7 @@ void __exit led_drv_exit(void)
 	device_destroy(led_class,led_dev);
 	class_destroy(led_class);
 	/*注销管脚，释放资源*/
-	
+	gpio_free(PAD_GPIO_C+12);
 	/*注销cdev*/
 	cdev_del(&led_cdev);
 	/*注销设备号，减少占用，节省资源*/
